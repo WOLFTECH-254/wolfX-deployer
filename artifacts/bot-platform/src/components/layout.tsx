@@ -3,14 +3,15 @@ import { LayoutDashboard, Bot, Server, Rocket, PlusCircle, Menu, X, Terminal, Se
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { LiveCounter } from "./live-counter";
+import { useIsAdmin } from "@/lib/admin-auth";
 
-const navItems = [
+const baseNavItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/bot", label: "Bot", icon: Bot },
   { href: "/servers", label: "Slots", icon: Server },
   { href: "/deployments", label: "Deployments", icon: Rocket },
-  { href: "/admin", label: "Admin", icon: Settings },
 ];
+const adminNavItem = { href: "/admin", label: "Admin", icon: Settings };
 
 function NavLink({ href, label, icon: Icon, onClick }: { href: string; label: string; icon: React.ComponentType<{ className?: string }>; onClick?: () => void }) {
   const [location] = useLocation();
@@ -35,6 +36,8 @@ function NavLink({ href, label, icon: Icon, onClick }: { href: string; label: st
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const isAdmin = useIsAdmin();
+  const navItems = isAdmin ? [...baseNavItems, adminNavItem] : baseNavItems;
 
   return (
     <div className="min-h-screen flex bg-background">

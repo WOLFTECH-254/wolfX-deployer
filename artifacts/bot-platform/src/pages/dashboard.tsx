@@ -7,6 +7,7 @@ import {
 import { Link } from "wouter";
 import { Server, Rocket, Bot, CheckCircle, XCircle, Clock, Settings, ArrowRight } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { useIsAdmin } from "@/lib/admin-auth";
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; className: string }> = {
@@ -56,6 +57,7 @@ export default function Dashboard() {
   const stats = useGetServerStats();
   const recent = useGetRecentDeployments();
   const platform = useGetPlatformConfig();
+  const isAdmin = useIsAdmin();
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -166,7 +168,7 @@ export default function Dashboard() {
           {[
             { href: "/bot", icon: Bot, label: "View Bot Info", desc: "See what session vars are required" },
             { href: "/deployments/new", icon: Rocket, label: "Add Your Session", desc: "Deploy onto a free slot" },
-            { href: "/admin", icon: Settings, label: "Admin Settings", desc: "Change bot or slot count" },
+            ...(isAdmin ? [{ href: "/admin", icon: Settings, label: "Admin Settings", desc: "Change bot or slot count" }] : []),
           ].map((item) => (
             <Link
               key={item.href}
