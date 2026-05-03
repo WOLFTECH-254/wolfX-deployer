@@ -1,9 +1,17 @@
 import { Link, useLocation } from "wouter";
 import { LayoutDashboard, Bot, Server, Rocket, PlusCircle, Menu, X, Terminal, Settings } from "lucide-react";
 import { useState } from "react";
+import { useGetPlatformConfig } from "@workspace/api-client-react";
 import { cn } from "@/lib/utils";
 import { LiveCounter } from "./live-counter";
 import { useIsAdmin } from "@/lib/admin-auth";
+
+function splitBrand(name: string): { head: string; tail: string } {
+  const upper = name.toUpperCase().replace(/\s+/g, "");
+  if (upper.length <= 3) return { head: "", tail: upper };
+  const cut = Math.max(3, Math.floor(upper.length / 2));
+  return { head: upper.slice(0, cut), tail: upper.slice(cut) };
+}
 
 const baseNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -37,6 +45,10 @@ function NavLink({ href, label, icon: Icon, onClick }: { href: string; label: st
 export function Layout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isAdmin = useIsAdmin();
+  const cfg = useGetPlatformConfig();
+  const brandName = cfg.data?.botName ?? "BotHost";
+  const brandLogo = cfg.data?.botLogo ?? cfg.data?.botAppJson?.logo;
+  const brand = splitBrand(brandName);
   const navItems = isAdmin ? [...baseNavItems, adminNavItem] : baseNavItems;
 
   return (
@@ -54,14 +66,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
       >
         <div className="flex items-center gap-2 px-4 py-4 border-b border-border">
           <Link href="/" data-testid="sidebar-home" className="flex items-center gap-2 flex-1 min-w-0 hover:opacity-80 transition-opacity">
-            <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/15 border border-primary/30">
-              <Terminal className="h-4 w-4 text-primary" />
-            </div>
+            {brandLogo ? (
+              <img src={brandLogo} alt="" className="h-8 w-8 rounded-md object-cover border border-primary/20" />
+            ) : (
+              <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/15 border border-primary/30">
+                <Terminal className="h-4 w-4 text-primary" />
+              </div>
+            )}
             <div className="min-w-0">
-              <span className="text-sm font-display font-extrabold text-foreground tracking-tight">
-                <span>WaBot</span><span className="text-primary text-glow-green">Deploy</span>
+              <span className="text-sm font-display font-extrabold text-foreground tracking-tight truncate block" data-testid="sidebar-brand">
+                {brand.head && <span>{brand.head}</span>}
+                <span className="text-primary text-glow-accent">{brand.tail}</span>
               </span>
-              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Open source</p>
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Open source · self-hosted</p>
             </div>
           </Link>
           <button onClick={() => setMobileOpen(false)} className="ml-auto md:hidden text-muted-foreground hover:text-foreground">
@@ -96,7 +113,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <button onClick={() => setMobileOpen(true)} className="text-muted-foreground hover:text-foreground md:hidden" data-testid="mobile-menu-btn">
             <Menu className="h-5 w-5" />
           </button>
-          <span className="text-sm font-bold text-foreground md:hidden">WaBotDeploy</span>
+          <span className="text-sm font-display font-bold text-foreground md:hidden truncate max-w-[160px]">{brandName}</span>
           <div className="ml-auto">
             <LiveCounter />
           </div>

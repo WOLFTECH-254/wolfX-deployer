@@ -129,8 +129,8 @@ export default function Landing() {
               <Terminal className="h-4 w-4 text-primary" />
             </div>
           )}
-          <span className="font-display font-extrabold text-base tracking-tight text-foreground" data-testid="brand">
-            <span>WaBot</span><span className="text-primary text-glow-green">Deploy</span>
+          <span className="font-display font-extrabold text-base tracking-tight text-foreground truncate max-w-[200px]" data-testid="brand">
+            {botName.toUpperCase()}
           </span>
         </div>
         <div className="flex items-center gap-3">

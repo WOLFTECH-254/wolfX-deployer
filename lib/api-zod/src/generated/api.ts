@@ -33,6 +33,16 @@ export const GetPlatformConfigResponse = zod.object({
       )
       .optional(),
     scripts: zod.record(zod.string(), zod.string()).optional(),
+    theme: zod
+      .enum(["green", "blue", "purple", "black"])
+      .optional()
+      .describe(
+        'Visual theme for the hosting platform UI. Optional; defaults to \"green\".',
+      ),
+    logo: zod
+      .string()
+      .optional()
+      .describe("Optional logo URL displayed in the platform UI."),
   }),
   slotCount: zod.number(),
   totalSlots: zod.number(),
@@ -116,6 +126,16 @@ export const FetchAppJsonResponse = zod.object({
     )
     .optional(),
   scripts: zod.record(zod.string(), zod.string()).optional(),
+  theme: zod
+    .enum(["green", "blue", "purple", "black"])
+    .optional()
+    .describe(
+      'Visual theme for the hosting platform UI. Optional; defaults to \"green\".',
+    ),
+  logo: zod
+    .string()
+    .optional()
+    .describe("Optional logo URL displayed in the platform UI."),
 });
 
 /**
@@ -144,6 +164,16 @@ export const ListAppsResponseItem = zod.object({
       )
       .optional(),
     scripts: zod.record(zod.string(), zod.string()).optional(),
+    theme: zod
+      .enum(["green", "blue", "purple", "black"])
+      .optional()
+      .describe(
+        'Visual theme for the hosting platform UI. Optional; defaults to \"green\".',
+      ),
+    logo: zod
+      .string()
+      .optional()
+      .describe("Optional logo URL displayed in the platform UI."),
   }),
   deploymentCount: zod.number(),
   createdAt: zod.coerce.date(),
@@ -188,6 +218,16 @@ export const GetAppResponse = zod.object({
       )
       .optional(),
     scripts: zod.record(zod.string(), zod.string()).optional(),
+    theme: zod
+      .enum(["green", "blue", "purple", "black"])
+      .optional()
+      .describe(
+        'Visual theme for the hosting platform UI. Optional; defaults to \"green\".',
+      ),
+    logo: zod
+      .string()
+      .optional()
+      .describe("Optional logo URL displayed in the platform UI."),
   }),
   deploymentCount: zod.number(),
   createdAt: zod.coerce.date(),
@@ -254,6 +294,16 @@ export const ListServersResponseItem = zod.object({
               )
               .optional(),
             scripts: zod.record(zod.string(), zod.string()).optional(),
+            theme: zod
+              .enum(["green", "blue", "purple", "black"])
+              .optional()
+              .describe(
+                'Visual theme for the hosting platform UI. Optional; defaults to \"green\".',
+              ),
+            logo: zod
+              .string()
+              .optional()
+              .describe("Optional logo URL displayed in the platform UI."),
           }),
           deploymentCount: zod.number(),
           createdAt: zod.coerce.date(),
@@ -331,6 +381,16 @@ export const GetServerResponse = zod.object({
               )
               .optional(),
             scripts: zod.record(zod.string(), zod.string()).optional(),
+            theme: zod
+              .enum(["green", "blue", "purple", "black"])
+              .optional()
+              .describe(
+                'Visual theme for the hosting platform UI. Optional; defaults to \"green\".',
+              ),
+            logo: zod
+              .string()
+              .optional()
+              .describe("Optional logo URL displayed in the platform UI."),
           }),
           deploymentCount: zod.number(),
           createdAt: zod.coerce.date(),
@@ -379,6 +439,16 @@ export const ListDeploymentsResponseItem = zod.object({
           )
           .optional(),
         scripts: zod.record(zod.string(), zod.string()).optional(),
+        theme: zod
+          .enum(["green", "blue", "purple", "black"])
+          .optional()
+          .describe(
+            'Visual theme for the hosting platform UI. Optional; defaults to \"green\".',
+          ),
+        logo: zod
+          .string()
+          .optional()
+          .describe("Optional logo URL displayed in the platform UI."),
       }),
       deploymentCount: zod.number(),
       createdAt: zod.coerce.date(),
@@ -461,6 +531,16 @@ export const GetRecentDeploymentsResponseItem = zod.object({
           )
           .optional(),
         scripts: zod.record(zod.string(), zod.string()).optional(),
+        theme: zod
+          .enum(["green", "blue", "purple", "black"])
+          .optional()
+          .describe(
+            'Visual theme for the hosting platform UI. Optional; defaults to \"green\".',
+          ),
+        logo: zod
+          .string()
+          .optional()
+          .describe("Optional logo URL displayed in the platform UI."),
       }),
       deploymentCount: zod.number(),
       createdAt: zod.coerce.date(),
@@ -535,6 +615,16 @@ export const GetDeploymentResponse = zod.object({
           )
           .optional(),
         scripts: zod.record(zod.string(), zod.string()).optional(),
+        theme: zod
+          .enum(["green", "blue", "purple", "black"])
+          .optional()
+          .describe(
+            'Visual theme for the hosting platform UI. Optional; defaults to \"green\".',
+          ),
+        logo: zod
+          .string()
+          .optional()
+          .describe("Optional logo URL displayed in the platform UI."),
       }),
       deploymentCount: zod.number(),
       createdAt: zod.coerce.date(),
@@ -607,6 +697,16 @@ export const RestartDeploymentResponse = zod.object({
           )
           .optional(),
         scripts: zod.record(zod.string(), zod.string()).optional(),
+        theme: zod
+          .enum(["green", "blue", "purple", "black"])
+          .optional()
+          .describe(
+            'Visual theme for the hosting platform UI. Optional; defaults to \"green\".',
+          ),
+        logo: zod
+          .string()
+          .optional()
+          .describe("Optional logo URL displayed in the platform UI."),
       }),
       deploymentCount: zod.number(),
       createdAt: zod.coerce.date(),
@@ -667,6 +767,16 @@ export const StopDeploymentResponse = zod.object({
           )
           .optional(),
         scripts: zod.record(zod.string(), zod.string()).optional(),
+        theme: zod
+          .enum(["green", "blue", "purple", "black"])
+          .optional()
+          .describe(
+            'Visual theme for the hosting platform UI. Optional; defaults to \"green\".',
+          ),
+        logo: zod
+          .string()
+          .optional()
+          .describe("Optional logo URL displayed in the platform UI."),
       }),
       deploymentCount: zod.number(),
       createdAt: zod.coerce.date(),

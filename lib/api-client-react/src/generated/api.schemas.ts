@@ -34,12 +34,29 @@ export type AppJsonDataEnv = { [key: string]: AppJsonEnvVar };
 
 export type AppJsonDataScripts = { [key: string]: string };
 
+/**
+ * Visual theme for the hosting platform UI. Optional; defaults to "green".
+ */
+export type AppJsonDataTheme =
+  (typeof AppJsonDataTheme)[keyof typeof AppJsonDataTheme];
+
+export const AppJsonDataTheme = {
+  green: "green",
+  blue: "blue",
+  purple: "purple",
+  black: "black",
+} as const;
+
 export interface AppJsonData {
   name: string;
   description?: string;
   keywords?: string[];
   env?: AppJsonDataEnv;
   scripts?: AppJsonDataScripts;
+  /** Visual theme for the hosting platform UI. Optional; defaults to "green". */
+  theme?: AppJsonDataTheme;
+  /** Optional logo URL displayed in the platform UI. */
+  logo?: string;
 }
 
 export interface App {

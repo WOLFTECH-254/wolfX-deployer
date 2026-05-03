@@ -543,6 +543,13 @@ components:
           type: object
           additionalProperties:
             type: string
+        theme:
+          type: string
+          description: Visual theme for the hosting platform UI. Optional; defaults to "green".
+          enum: [green, blue, purple, black]
+        logo:
+          type: string
+          description: Optional logo URL displayed in the platform UI.
       required: [name]
 
     App:
