@@ -111,6 +111,12 @@ export default function Landing() {
   const envVars = (data?.botAppJson?.env ?? {}) as Record<string, { description?: string; required?: boolean }>;
   const tagPills = Object.keys(envVars).slice(0, 6);
 
+  // Source button prefers the platform deployer's own repo (set via
+  // PLATFORM_SOURCE_URL env var). Falls back to the bot repo so existing
+  // deployments keep working without configuration.
+  const sourceUrl = data?.platformSourceUrl ?? data?.botRepoUrl ?? null;
+  const sourceIsBotRepo = !data?.platformSourceUrl && !!data?.botRepoUrl;
+
   const free = data?.availableSlots ?? 0;
   const taken = data?.occupiedSlots ?? 0;
   const total = data?.slotCount ?? 0;
@@ -134,14 +140,15 @@ export default function Landing() {
           </span>
         </div>
         <div className="flex items-center gap-3">
-          {data?.botRepoUrl && (
+          {sourceUrl && (
             <a
-              href={data.botRepoUrl}
+              href={sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
               data-testid="nav-github"
               className="text-muted-foreground hover:text-primary transition-colors p-2"
-              aria-label="GitHub repo"
+              aria-label={sourceIsBotRepo ? "Bot repo" : "Platform source repo"}
+              title={sourceIsBotRepo ? "Bot source repo" : "Platform source repo"}
             >
               <Github className="h-4 w-4" />
             </a>
@@ -200,8 +207,14 @@ export default function Landing() {
                   Deploy now
                 </Button>
               </Link>
-              {data?.botRepoUrl && (
-                <a href={data.botRepoUrl} target="_blank" rel="noopener noreferrer" data-testid="cta-github">
+              {sourceUrl && (
+                <a
+                  href={sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid="cta-github"
+                  title={sourceIsBotRepo ? "Bot source repo" : "Platform source repo"}
+                >
                   <Button size="lg" variant="outline" className="font-mono uppercase tracking-wider text-xs gap-2 h-11 px-6 border-primary/20 hover:border-primary/40 hover:bg-primary/5">
                     <Github className="h-4 w-4" />
                     Source

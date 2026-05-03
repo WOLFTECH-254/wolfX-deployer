@@ -44,6 +44,12 @@ pnpm workspace monorepo using TypeScript. This is **WaBotDeploy** — an open-so
 - `servers` — 25 server slots with status (available/occupied/maintenance)
 - `deployments` — bot deployments linking apps to server slots
 
+## Optional Env Vars
+
+- `PLATFORM_SOURCE_URL` — URL the landing page "Source" button points to
+  (the platform deployer's own fork). Falls back to the configured bot repo
+  if unset.
+
 ## Key Commands
 
 - `pnpm run typecheck` — full typecheck across all packages

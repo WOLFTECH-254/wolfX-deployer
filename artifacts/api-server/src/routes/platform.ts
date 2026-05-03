@@ -31,6 +31,7 @@ router.get("/platform/config", async (_req, res) => {
     botDescription: cfg.botDescription,
     botLogo: cfg.botLogo,
     botAppJson: cfg.botAppJson,
+    platformSourceUrl: process.env.PLATFORM_SOURCE_URL || null,
     slotCount: cfg.slotCount,
     totalSlots: total,
     occupiedSlots: occupied,

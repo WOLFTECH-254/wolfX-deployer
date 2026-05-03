@@ -44,6 +44,12 @@ export const GetPlatformConfigResponse = zod.object({
       .optional()
       .describe("Optional logo URL displayed in the platform UI."),
   }),
+  platformSourceUrl: zod
+    .string()
+    .nullish()
+    .describe(
+      'URL to the platform deployer\'s own source repo (set via PLATFORM_SOURCE_URL env var). Used by the landing page \"Source\" button. Falls back to botRepoUrl when null.',
+    ),
   slotCount: zod.number(),
   totalSlots: zod.number(),
   occupiedSlots: zod.number(),

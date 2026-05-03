@@ -153,6 +153,8 @@ export interface PlatformConfig {
   botDescription?: string | null;
   botLogo?: string | null;
   botAppJson: AppJsonData;
+  /** URL to the platform deployer's own source repo (set via PLATFORM_SOURCE_URL env var). Used by the landing page "Source" button. Falls back to botRepoUrl when null. */
+  platformSourceUrl?: string | null;
   slotCount: number;
   totalSlots: number;
   occupiedSlots: number;
