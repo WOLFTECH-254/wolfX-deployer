@@ -1,6 +1,7 @@
 import app from "./app";
 import { logger } from "./lib/logger";
 import { initPlatformConfig } from "./lib/platform-init";
+import { reconcileOnStartup, shutdownAll } from "./lib/runner";
 
 const rawPort = process.env["PORT"];
 
@@ -18,6 +19,7 @@ if (Number.isNaN(port) || port <= 0) {
 
 async function main() {
   await initPlatformConfig();
+  await reconcileOnStartup();
   app.listen(port, (err) => {
     if (err) {
       logger.error({ err }, "Error listening on port");
@@ -26,6 +28,20 @@ async function main() {
     logger.info({ port }, "Server listening");
   });
 }
+
+let shuttingDown = false;
+async function gracefulShutdown(signal: string) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  logger.info({ signal }, "Received shutdown signal");
+  try {
+    await shutdownAll();
+  } finally {
+    process.exit(0);
+  }
+}
+process.on("SIGTERM", () => void gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => void gracefulShutdown("SIGINT"));
 
 main().catch((err) => {
   logger.error({ err }, "Fatal startup error");

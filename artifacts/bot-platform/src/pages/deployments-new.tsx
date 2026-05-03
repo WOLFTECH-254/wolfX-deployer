@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "wouter";
 import {
   useGetPlatformConfig,
@@ -78,16 +78,17 @@ export default function DeploymentsNew() {
     [servers.data, slotCount],
   );
 
-  // Seed defaults from app.json
+  // Seed defaults from app.json exactly once when config first loads.
+  const seededRef = useRef(false);
   useEffect(() => {
-    if (cfg.data && Object.keys(envConfig).length === 0) {
-      const defaults: Record<string, string> = {};
-      Object.entries(envVars).forEach(([key, v]) => {
-        if (v.value) defaults[key] = v.value;
-      });
-      setEnvConfig(defaults);
-    }
-  }, [cfg.data, envVars, envConfig]);
+    if (seededRef.current || !cfg.data) return;
+    seededRef.current = true;
+    const defaults: Record<string, string> = {};
+    Object.entries(envVars).forEach(([key, v]) => {
+      if (v.value) defaults[key] = v.value;
+    });
+    if (Object.keys(defaults).length > 0) setEnvConfig(defaults);
+  }, [cfg.data, envVars]);
 
   function canProceed() {
     if (step === 0) {

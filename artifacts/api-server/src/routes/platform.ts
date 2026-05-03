@@ -5,6 +5,7 @@ import { sql } from "drizzle-orm";
 import { applyBotConfig, getAdminPassword, isAdminPasswordDefault } from "../lib/platform-init";
 import { AppJsonFetchError } from "../lib/github";
 import { requireAdmin } from "../middlewares/admin";
+import { clearRepoCache, getCapacityInfo } from "../lib/runner";
 import { z } from "zod/v4";
 
 const router = Router();
@@ -36,6 +37,7 @@ router.get("/platform/config", async (_req, res) => {
     availableSlots: Math.max(0, cfg.slotCount - occupied),
     updatedAt: cfg.updatedAt,
     adminPasswordIsDefault: isAdminPasswordDefault(),
+    capacity: getCapacityInfo(),
   });
 });
 
@@ -83,7 +85,12 @@ router.put("/platform/config", requireAdmin, async (req, res) => {
     return;
   }
   try {
+    const repoChanged = !!current && current.botRepoUrl !== repoUrl;
     const result = await applyBotConfig(repoUrl, slotCount);
+    if (repoChanged) {
+      // Different bot — wipe cached clones so next deploy fetches the new repo.
+      await clearRepoCache();
+    }
     res.json({
       success: true,
       message: `Bot configured: ${result.meta.name}`,

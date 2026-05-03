@@ -4,6 +4,7 @@ import { eq, desc, sql, and, inArray } from "drizzle-orm";
 import { db, deploymentsTable, serversTable, appsTable, platformConfigTable, deploymentLogsTable } from "@workspace/db";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import { CreateDeploymentBody } from "@workspace/api-zod";
+import { startBot, stopBot, getCapacityInfo } from "../lib/runner";
 
 const router = Router();
 
@@ -180,7 +181,6 @@ router.post("/deployments", async (req, res) => {
       .where(eq(serversTable.id, targetServerId));
 
     await appendLog(tx, dep.id, "info", `Deployment created on slot #${targetServerId} by ${deployedBy ?? "anonymous"}`);
-    await appendLog(tx, dep.id, "info", "Status set to running. Bot process execution is not yet implemented on this platform.");
 
     return { kind: "ok", dep };
   });
@@ -189,6 +189,9 @@ router.post("/deployments", async (req, res) => {
     res.status(result.status).json(result.body);
     return;
   }
+  // Fire-and-forget: clone, install, spawn. The runner streams real logs
+  // into deployment_logs and updates status to failed/stopped on exit.
+  void startBot(result.dep.id);
   res.status(201).json(await enrichDeployment(result.dep));
 });
 
@@ -196,6 +199,10 @@ router.get("/deployments/recent", async (_req, res) => {
   const deps = await db.select().from(deploymentsTable).orderBy(desc(deploymentsTable.createdAt)).limit(10);
   const result = await Promise.all(deps.map(enrichDeployment));
   res.json(result);
+});
+
+router.get("/deployments/capacity", async (_req, res) => {
+  res.json(getCapacityInfo());
 });
 
 router.get("/deployments/summary", async (_req, res) => {
@@ -227,6 +234,8 @@ router.delete("/deployments/:id", async (req, res) => {
   if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
   const [dep] = await db.select().from(deploymentsTable).where(eq(deploymentsTable.id, id));
   if (!dep) { res.status(404).json({ error: "Deployment not found" }); return; }
+  // Stop the running process (if any) and wipe its working dir before removing rows.
+  await stopBot(id, { wipeDir: true });
   // Cascade-delete logs first so we don't leave orphans (no FK constraint)
   await db.delete(deploymentLogsTable).where(eq(deploymentLogsTable.deploymentId, id));
   await db.delete(deploymentsTable).where(eq(deploymentsTable.id, id));
@@ -268,6 +277,9 @@ router.post("/deployments/:id/restart", async (req, res) => {
     res.status(result.status).json(result.body);
     return;
   }
+  // Make sure any leftover process is gone, then spawn a fresh one.
+  await stopBot(id);
+  void startBot(id);
   res.json(await enrichDeployment(result.dep));
 });
 
@@ -276,11 +288,14 @@ router.post("/deployments/:id/stop", async (req, res) => {
   if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
   const [dep] = await db.select().from(deploymentsTable).where(eq(deploymentsTable.id, id));
   if (!dep) { res.status(404).json({ error: "Deployment not found" }); return; }
+  await appendLog(db, id, "warn", "Stop requested by user");
+  await stopBot(id);
+  // The runner's exit handler will set status to "stopped"; for the immediate
+  // response also flip the row so the UI reflects the action right away.
   const [updated] = await db.update(deploymentsTable)
     .set({ status: "stopped", updatedAt: new Date() })
     .where(eq(deploymentsTable.id, id))
     .returning();
-  await appendLog(db, id, "warn", "Deployment stopped by user request");
   res.json(await enrichDeployment(updated));
 });
 
