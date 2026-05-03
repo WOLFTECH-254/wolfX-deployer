@@ -2,6 +2,7 @@ import { Router } from "express";
 import { eq, sql } from "drizzle-orm";
 import { db, appsTable, deploymentsTable } from "@workspace/db";
 import { CreateAppBody } from "@workspace/api-zod";
+import { fetchAppJsonFromGithub } from "./github.js";
 
 const router = Router();
 
@@ -42,23 +43,16 @@ router.post("/apps", async (req, res) => {
   const { repoUrl } = parsed.data;
   const parts = parseGithubUrl(repoUrl);
   if (!parts) {
-    res.status(400).json({ error: "Invalid GitHub repository URL" });
+    res.status(400).json({ error: "That doesn't look like a GitHub URL. Use the form https://github.com/owner/repo." });
     return;
   }
 
-  const rawUrl = `https://raw.githubusercontent.com/${parts.owner}/${parts.repo}/HEAD/app.json`;
-  let appJson: Record<string, unknown>;
-  try {
-    const response = await fetch(rawUrl);
-    if (!response.ok) {
-      res.status(400).json({ error: "Could not find app.json in the repository" });
-      return;
-    }
-    appJson = await response.json() as Record<string, unknown>;
-  } catch {
-    res.status(400).json({ error: "Failed to fetch app.json from the repository" });
+  const result = await fetchAppJsonFromGithub(parts.owner, parts.repo);
+  if (!result.ok) {
+    res.status(result.status === 502 ? 502 : 400).json({ error: result.error });
     return;
   }
+  const appJson = result.appJson;
 
   const name = (appJson.name as string) || `${parts.owner}/${parts.repo}`;
   const description = (appJson.description as string) || null;

@@ -20,11 +20,20 @@ export default function AppsNew() {
 
   const preview = fetchAppJson.data;
 
+  function extractError(err: unknown, fallback: string): string {
+    const e = err as { data?: { error?: string }; message?: string } | undefined;
+    return e?.data?.error ?? e?.message ?? fallback;
+  }
+
   function handleFetch() {
     if (!repoUrl.trim()) return;
     fetchAppJson.mutate({ repoUrl: repoUrl.trim() }, {
-      onError: () => {
-        toast({ title: "Could not find app.json", description: "Make sure the repo is public and has an app.json at the root.", variant: "destructive" });
+      onError: (err) => {
+        toast({
+          title: "Could not fetch app.json",
+          description: extractError(err, "Make sure the repo is public and has an app.json at the root."),
+          variant: "destructive",
+        });
       }
     });
   }
@@ -36,8 +45,12 @@ export default function AppsNew() {
         toast({ title: "App registered", description: `"${app.name}" is now in the registry.` });
         setLocation("/apps");
       },
-      onError: () => {
-        toast({ title: "Registration failed", description: "This repo may already be registered.", variant: "destructive" });
+      onError: (err) => {
+        toast({
+          title: "Registration failed",
+          description: extractError(err, "This repo may already be registered."),
+          variant: "destructive",
+        });
       }
     });
   }
@@ -156,9 +169,9 @@ export default function AppsNew() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Example repositories</p>
           <div className="space-y-1.5">
             {[
-              "https://github.com/WhiskeySockets/Baileys",
-              "https://github.com/danielgross/whatsapp-gpt",
-              "https://github.com/open-wa/wa-automate-nodejs",
+              "https://github.com/heroku/python-getting-started",
+              "https://github.com/heroku/ruby-rails-sample",
+              "https://github.com/heroku/node-js-getting-started",
             ].map((url) => (
               <button
                 key={url}
