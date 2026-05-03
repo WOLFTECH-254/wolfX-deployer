@@ -231,7 +231,11 @@
   }
 
   /* Backwards-compat alias used in older code */
-  .text-glow-green { @apply text-glow-accent; }
+  .text-glow-green {
+    text-shadow:
+      0 0 3px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.10),
+      0 0 8px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.04);
+  }
 
   .ring-glow-accent {
     box-shadow:
@@ -239,7 +243,12 @@
       0 0 12px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.05),
       inset 0 0 12px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.015);
   }
-  .ring-glow-green { @apply ring-glow-accent; }
+  .ring-glow-green {
+    box-shadow:
+      0 0 0 1px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.14),
+      0 0 12px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.05),
+      inset 0 0 12px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.015);
+  }
 
   .btn-glow-accent {
     box-shadow:
@@ -247,7 +256,12 @@
       0 4px 16px -10px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.22),
       inset 0 1px 0 hsla(var(--accent-h), 50%, 80%, 0.08);
   }
-  .btn-glow-green { @apply btn-glow-accent; }
+  .btn-glow-green {
+    box-shadow:
+      0 0 0 1px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.22),
+      0 4px 16px -10px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.22),
+      inset 0 1px 0 hsla(var(--accent-h), 50%, 80%, 0.08);
+  }
 
   .font-display {
     font-family: var(--app-font-display);
