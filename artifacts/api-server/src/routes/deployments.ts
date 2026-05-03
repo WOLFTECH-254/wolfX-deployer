@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { createHash } from "crypto";
 import { eq, desc, sql, and, inArray } from "drizzle-orm";
-import { db, deploymentsTable, serversTable, appsTable, platformConfigTable } from "@workspace/db";
+import { db, deploymentsTable, serversTable, appsTable, platformConfigTable, deploymentLogsTable } from "@workspace/db";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import { CreateDeploymentBody } from "@workspace/api-zod";
 
@@ -65,25 +65,13 @@ async function enrichDeployment(dep: typeof deploymentsTable.$inferSelect) {
   };
 }
 
-function generateMockLogs(dep: typeof deploymentsTable.$inferSelect) {
-  const entries = [];
-  const base = new Date(dep.createdAt);
-  entries.push({ timestamp: new Date(base.getTime() + 0).toISOString(), level: "info", message: "Pulling repository from GitHub..." });
-  entries.push({ timestamp: new Date(base.getTime() + 1200).toISOString(), level: "info", message: "Repository cloned successfully" });
-  entries.push({ timestamp: new Date(base.getTime() + 2400).toISOString(), level: "info", message: "Installing dependencies..." });
-  entries.push({ timestamp: new Date(base.getTime() + 5000).toISOString(), level: "info", message: "Dependencies installed" });
-  entries.push({ timestamp: new Date(base.getTime() + 5200).toISOString(), level: "info", message: "Starting bot process..." });
-  if (dep.status === "running") {
-    entries.push({ timestamp: new Date(base.getTime() + 6000).toISOString(), level: "info", message: "Bot connected to WhatsApp servers" });
-    entries.push({ timestamp: new Date(base.getTime() + 6500).toISOString(), level: "info", message: "Listening for messages..." });
-  } else if (dep.status === "failed") {
-    entries.push({ timestamp: new Date(base.getTime() + 6000).toISOString(), level: "error", message: "Connection refused: check your credentials" });
-    entries.push({ timestamp: new Date(base.getTime() + 6100).toISOString(), level: "error", message: "Bot process exited with code 1" });
-  } else if (dep.status === "stopped") {
-    entries.push({ timestamp: new Date(base.getTime() + 6000).toISOString(), level: "warn", message: "Received SIGTERM signal" });
-    entries.push({ timestamp: new Date(base.getTime() + 6200).toISOString(), level: "info", message: "Bot stopped gracefully" });
-  }
-  return entries;
+async function appendLog(
+  tx: Tx | typeof db,
+  deploymentId: number,
+  level: "info" | "warn" | "error",
+  message: string,
+): Promise<void> {
+  await tx.insert(deploymentLogsTable).values({ deploymentId, level, message });
 }
 
 router.get("/deployments", async (_req, res) => {
@@ -191,6 +179,9 @@ router.post("/deployments", async (req, res) => {
       .set({ status: "occupied", currentDeploymentId: dep.id })
       .where(eq(serversTable.id, targetServerId));
 
+    await appendLog(tx, dep.id, "info", `Deployment created on slot #${targetServerId} by ${deployedBy ?? "anonymous"}`);
+    await appendLog(tx, dep.id, "info", "Status set to running. Bot process execution is not yet implemented on this platform.");
+
     return { kind: "ok", dep };
   });
 
@@ -236,6 +227,8 @@ router.delete("/deployments/:id", async (req, res) => {
   if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
   const [dep] = await db.select().from(deploymentsTable).where(eq(deploymentsTable.id, id));
   if (!dep) { res.status(404).json({ error: "Deployment not found" }); return; }
+  // Cascade-delete logs first so we don't leave orphans (no FK constraint)
+  await db.delete(deploymentLogsTable).where(eq(deploymentLogsTable.deploymentId, id));
   await db.delete(deploymentsTable).where(eq(deploymentsTable.id, id));
   await db.update(serversTable)
     .set({ status: "available", currentDeploymentId: null })
@@ -268,6 +261,7 @@ router.post("/deployments/:id/restart", async (req, res) => {
       .set({ status: "running", updatedAt: new Date() })
       .where(eq(deploymentsTable.id, id))
       .returning();
+    await appendLog(tx, id, "info", `Deployment restarted (previous status: ${dep.status})`);
     return { kind: "ok", dep: updated };
   });
   if (result.kind === "err") {
@@ -286,6 +280,7 @@ router.post("/deployments/:id/stop", async (req, res) => {
     .set({ status: "stopped", updatedAt: new Date() })
     .where(eq(deploymentsTable.id, id))
     .returning();
+  await appendLog(db, id, "warn", "Deployment stopped by user request");
   res.json(await enrichDeployment(updated));
 });
 
@@ -294,7 +289,17 @@ router.get("/deployments/:id/logs", async (req, res) => {
   if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
   const [dep] = await db.select().from(deploymentsTable).where(eq(deploymentsTable.id, id));
   if (!dep) { res.status(404).json({ error: "Deployment not found" }); return; }
-  res.json({ deploymentId: id, logs: generateMockLogs(dep) });
+  const rows = await db
+    .select()
+    .from(deploymentLogsTable)
+    .where(eq(deploymentLogsTable.deploymentId, id))
+    .orderBy(deploymentLogsTable.createdAt, deploymentLogsTable.id);
+  const logs = rows.map((r) => ({
+    timestamp: r.createdAt.toISOString(),
+    level: r.level,
+    message: r.message,
+  }));
+  res.json({ deploymentId: id, logs });
 });
 
 export default router;
