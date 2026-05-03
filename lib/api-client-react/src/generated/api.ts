@@ -17,6 +17,7 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  ActiveSessions,
   App,
   AppJsonData,
   CreateAppBody,
@@ -27,9 +28,12 @@ import type {
   ErrorResponse,
   FetchAppJsonBody,
   HealthStatus,
+  PlatformConfig,
+  PlatformLoginBody,
   Server,
   ServerStats,
   SuccessResponse,
+  UpdatePlatformConfigBody,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -40,6 +44,329 @@ type AwaitedInput<T> = PromiseLike<T> | T;
 type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+/**
+ * @summary Get current platform configuration (configured bot + slot info)
+ */
+export const getGetPlatformConfigUrl = () => {
+  return `/api/platform/config`;
+};
+
+export const getPlatformConfig = async (
+  options?: RequestInit,
+): Promise<PlatformConfig> => {
+  return customFetch<PlatformConfig>(getGetPlatformConfigUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetPlatformConfigQueryKey = () => {
+  return [`/api/platform/config`] as const;
+};
+
+export const getGetPlatformConfigQueryOptions = <
+  TData = Awaited<ReturnType<typeof getPlatformConfig>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getPlatformConfig>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetPlatformConfigQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getPlatformConfig>>
+  > = ({ signal }) => getPlatformConfig({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getPlatformConfig>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetPlatformConfigQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getPlatformConfig>>
+>;
+export type GetPlatformConfigQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Get current platform configuration (configured bot + slot info)
+ */
+
+export function useGetPlatformConfig<
+  TData = Awaited<ReturnType<typeof getPlatformConfig>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getPlatformConfig>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetPlatformConfigQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Update platform's configured bot and/or slot count (admin only)
+ */
+export const getUpdatePlatformConfigUrl = () => {
+  return `/api/platform/config`;
+};
+
+export const updatePlatformConfig = async (
+  updatePlatformConfigBody: UpdatePlatformConfigBody,
+  options?: RequestInit,
+): Promise<SuccessResponse> => {
+  return customFetch<SuccessResponse>(getUpdatePlatformConfigUrl(), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updatePlatformConfigBody),
+  });
+};
+
+export const getUpdatePlatformConfigMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updatePlatformConfig>>,
+    TError,
+    { data: BodyType<UpdatePlatformConfigBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updatePlatformConfig>>,
+  TError,
+  { data: BodyType<UpdatePlatformConfigBody> },
+  TContext
+> => {
+  const mutationKey = ["updatePlatformConfig"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updatePlatformConfig>>,
+    { data: BodyType<UpdatePlatformConfigBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return updatePlatformConfig(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdatePlatformConfigMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updatePlatformConfig>>
+>;
+export type UpdatePlatformConfigMutationBody =
+  BodyType<UpdatePlatformConfigBody>;
+export type UpdatePlatformConfigMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Update platform's configured bot and/or slot count (admin only)
+ */
+export const useUpdatePlatformConfig = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updatePlatformConfig>>,
+    TError,
+    { data: BodyType<UpdatePlatformConfigBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updatePlatformConfig>>,
+  TError,
+  { data: BodyType<UpdatePlatformConfigBody> },
+  TContext
+> => {
+  return useMutation(getUpdatePlatformConfigMutationOptions(options));
+};
+
+/**
+ * @summary Verify admin password
+ */
+export const getPlatformLoginUrl = () => {
+  return `/api/platform/login`;
+};
+
+export const platformLogin = async (
+  platformLoginBody: PlatformLoginBody,
+  options?: RequestInit,
+): Promise<SuccessResponse> => {
+  return customFetch<SuccessResponse>(getPlatformLoginUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(platformLoginBody),
+  });
+};
+
+export const getPlatformLoginMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof platformLogin>>,
+    TError,
+    { data: BodyType<PlatformLoginBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof platformLogin>>,
+  TError,
+  { data: BodyType<PlatformLoginBody> },
+  TContext
+> => {
+  const mutationKey = ["platformLogin"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof platformLogin>>,
+    { data: BodyType<PlatformLoginBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return platformLogin(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PlatformLoginMutationResult = NonNullable<
+  Awaited<ReturnType<typeof platformLogin>>
+>;
+export type PlatformLoginMutationBody = BodyType<PlatformLoginBody>;
+export type PlatformLoginMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Verify admin password
+ */
+export const usePlatformLogin = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof platformLogin>>,
+    TError,
+    { data: BodyType<PlatformLoginBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof platformLogin>>,
+  TError,
+  { data: BodyType<PlatformLoginBody> },
+  TContext
+> => {
+  return useMutation(getPlatformLoginMutationOptions(options));
+};
+
+/**
+ * @summary Get fingerprints of currently-active SESSION_IDs (last 6 chars only)
+ */
+export const getGetActiveSessionsUrl = () => {
+  return `/api/platform/active-sessions`;
+};
+
+export const getActiveSessions = async (
+  options?: RequestInit,
+): Promise<ActiveSessions> => {
+  return customFetch<ActiveSessions>(getGetActiveSessionsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetActiveSessionsQueryKey = () => {
+  return [`/api/platform/active-sessions`] as const;
+};
+
+export const getGetActiveSessionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getActiveSessions>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getActiveSessions>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetActiveSessionsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getActiveSessions>>
+  > = ({ signal }) => getActiveSessions({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getActiveSessions>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetActiveSessionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getActiveSessions>>
+>;
+export type GetActiveSessionsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get fingerprints of currently-active SESSION_IDs (last 6 chars only)
+ */
+
+export function useGetActiveSessions<
+  TData = Awaited<ReturnType<typeof getActiveSessions>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getActiveSessions>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetActiveSessionsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
 
 /**
  * @summary Health check

@@ -18,8 +18,100 @@ tags:
     description: Bot deployments
   - name: github
     description: GitHub utilities
+  - name: platform
+    description: Platform-wide configuration (single bot, slot count, admin)
 
 paths:
+  /platform/config:
+    get:
+      operationId: getPlatformConfig
+      tags: [platform]
+      summary: Get current platform configuration (configured bot + slot info)
+      responses:
+        "200":
+          description: Platform config
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformConfig"
+        "503":
+          description: Platform not initialized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updatePlatformConfig
+      tags: [platform]
+      summary: Update platform's configured bot and/or slot count (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePlatformConfigBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Invalid bot repo or shrinking below occupied slots
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Admin auth required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /platform/login:
+    post:
+      operationId: platformLogin
+      tags: [platform]
+      summary: Verify admin password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+              required: [password]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Wrong password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /platform/active-sessions:
+    get:
+      operationId: getActiveSessions
+      tags: [platform]
+      summary: Get fingerprints of currently-active SESSION_IDs (last 6 chars only)
+      responses:
+        "200":
+          description: Active session fingerprints
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActiveSessions"
+
   /healthz:
     get:
       operationId: healthCheck
@@ -564,7 +656,8 @@ components:
       properties:
         appId:
           type: integer
-          description: ID of the registered app to deploy
+          nullable: true
+          description: Optional app ID. If omitted, the platform's configured bot is used.
         serverId:
           type: integer
           nullable: true
@@ -578,7 +671,64 @@ components:
           type: string
           nullable: true
           description: Name or handle of the person deploying
-      required: [appId, envConfig]
+      required: [envConfig]
+
+    PlatformConfig:
+      type: object
+      properties:
+        botRepoUrl:
+          type: string
+        botRepoOwner:
+          type: string
+        botRepoName:
+          type: string
+        botName:
+          type: string
+        botDescription:
+          type: string
+          nullable: true
+        botLogo:
+          type: string
+          nullable: true
+        botAppJson:
+          $ref: "#/components/schemas/AppJsonData"
+        slotCount:
+          type: integer
+        totalSlots:
+          type: integer
+        occupiedSlots:
+          type: integer
+        availableSlots:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+        adminPasswordIsDefault:
+          type: boolean
+      required:
+        [botRepoUrl, botRepoOwner, botRepoName, botName, botAppJson, slotCount, totalSlots, occupiedSlots, availableSlots, updatedAt, adminPasswordIsDefault]
+
+    UpdatePlatformConfigBody:
+      type: object
+      properties:
+        botRepoUrl:
+          type: string
+          description: New GitHub repo URL for the bot
+        slotCount:
+          type: integer
+          minimum: 1
+          maximum: 500
+
+    ActiveSessions:
+      type: object
+      properties:
+        count:
+          type: integer
+        fingerprints:
+          type: array
+          items:
+            type: string
+      required: [count, fingerprints]
 
     DeploymentSummary:
       type: object

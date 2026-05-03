@@ -118,14 +118,45 @@ export interface ServerStats {
 export type CreateDeploymentBodyEnvConfig = { [key: string]: string };
 
 export interface CreateDeploymentBody {
-  /** ID of the registered app to deploy */
-  appId: number;
+  /** Optional app ID. If omitted, the platform's configured bot is used. */
+  appId?: number | null;
   /** Optional specific server slot ID. If omitted, auto-assigns a free slot. */
   serverId?: number | null;
   /** Environment variable values from the app.json form */
   envConfig: CreateDeploymentBodyEnvConfig;
   /** Name or handle of the person deploying */
   deployedBy?: string | null;
+}
+
+export interface PlatformConfig {
+  botRepoUrl: string;
+  botRepoOwner: string;
+  botRepoName: string;
+  botName: string;
+  botDescription?: string | null;
+  botLogo?: string | null;
+  botAppJson: AppJsonData;
+  slotCount: number;
+  totalSlots: number;
+  occupiedSlots: number;
+  availableSlots: number;
+  updatedAt: string;
+  adminPasswordIsDefault: boolean;
+}
+
+export interface UpdatePlatformConfigBody {
+  /** New GitHub repo URL for the bot */
+  botRepoUrl?: string;
+  /**
+   * @minimum 1
+   * @maximum 500
+   */
+  slotCount?: number;
+}
+
+export interface ActiveSessions {
+  count: number;
+  fingerprints: string[];
 }
 
 export interface DeploymentSummary {
@@ -154,3 +185,7 @@ export interface DeploymentLogs {
   deploymentId: number;
   logs: LogEntry[];
 }
+
+export type PlatformLoginBody = {
+  password: string;
+};

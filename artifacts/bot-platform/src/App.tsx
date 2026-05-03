@@ -5,9 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
-import Apps from "@/pages/apps";
-import AppsNew from "@/pages/apps-new";
-import AppDetail from "@/pages/app-detail";
+import BotPage from "@/pages/bot";
+import AdminPage from "@/pages/admin";
 import Servers from "@/pages/servers";
 import Deployments from "@/pages/deployments";
 import DeploymentsNew from "@/pages/deployments-new";
@@ -27,9 +26,8 @@ function Router() {
     <Layout>
       <Switch>
         <Route path="/" component={Dashboard} />
-        <Route path="/apps" component={Apps} />
-        <Route path="/apps/new" component={AppsNew} />
-        <Route path="/apps/:id" component={AppDetail} />
+        <Route path="/bot" component={BotPage} />
+        <Route path="/admin" component={AdminPage} />
         <Route path="/servers" component={Servers} />
         <Route path="/deployments" component={Deployments} />
         <Route path="/deployments/new" component={DeploymentsNew} />

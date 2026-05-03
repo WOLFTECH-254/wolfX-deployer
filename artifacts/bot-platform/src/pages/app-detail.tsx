@@ -1,5 +1,5 @@
 import { useParams, Link } from "wouter";
-import { useGetApp, useDeleteApp, useListDeployments, getListAppsQueryKey } from "@workspace/api-client-react";
+import { useGetApp, useDeleteApp, useListDeployments, getListAppsQueryKey, getGetAppQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { GitBranch, ExternalLink, Trash2, Rocket, ArrowLeft, ArrowRight } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -31,7 +31,7 @@ export default function AppDetail() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const app = useGetApp(numId, { query: { enabled: !!numId } });
+  const app = useGetApp(numId, { query: { enabled: !!numId, queryKey: getGetAppQueryKey(numId) } });
   const allDeployments = useListDeployments();
   const deleteApp = useDeleteApp();
 

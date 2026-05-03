@@ -27,7 +27,7 @@ export default function AppsNew() {
 
   function handleFetch() {
     if (!repoUrl.trim()) return;
-    fetchAppJson.mutate({ repoUrl: repoUrl.trim() }, {
+    fetchAppJson.mutate({ data: { repoUrl: repoUrl.trim() } }, {
       onError: (err) => {
         toast({
           title: "Could not fetch app.json",
@@ -39,7 +39,7 @@ export default function AppsNew() {
   }
 
   function handleRegister() {
-    createApp.mutate({ repoUrl: repoUrl.trim() }, {
+    createApp.mutate({ data: { repoUrl: repoUrl.trim() } }, {
       onSuccess: (app) => {
         queryClient.invalidateQueries({ queryKey: getListAppsQueryKey() });
         toast({ title: "App registered", description: `"${app.name}" is now in the registry.` });

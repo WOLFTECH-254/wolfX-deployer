@@ -1,5 +1,5 @@
 import { useParams, Link } from "wouter";
-import { useGetDeployment, useGetDeploymentLogs, useRestartDeployment, useStopDeployment, useDeleteDeployment, getListDeploymentsQueryKey, getGetDeploymentQueryKey } from "@workspace/api-client-react";
+import { useGetDeployment, useGetDeploymentLogs, useRestartDeployment, useStopDeployment, useDeleteDeployment, getListDeploymentsQueryKey, getGetDeploymentQueryKey, getGetDeploymentLogsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, RefreshCw, Square, Trash2, Server, GitBranch, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
@@ -33,7 +33,7 @@ export default function DeploymentDetail() {
   const [showEnvValues, setShowEnvValues] = useState(false);
 
   const dep = useGetDeployment(numId, { query: { enabled: !!numId, queryKey: getGetDeploymentQueryKey(numId) } });
-  const logs = useGetDeploymentLogs(numId, { query: { enabled: !!numId } });
+  const logs = useGetDeploymentLogs(numId, { query: { enabled: !!numId, queryKey: getGetDeploymentLogsQueryKey(numId) } });
   const restartDeployment = useRestartDeployment();
   const stopDeployment = useStopDeployment();
   const deleteDeployment = useDeleteDeployment();
@@ -44,7 +44,7 @@ export default function DeploymentDetail() {
   }
 
   function handleRestart() {
-    restartDeployment.mutate({ id: numId }, {
+    restartDeployment.mutate({ id: numId } as { id: number }, {
       onSuccess: () => { invalidate(); toast({ title: "Deployment restarted" }); },
       onError: () => toast({ title: "Error", description: "Failed to restart.", variant: "destructive" }),
     });

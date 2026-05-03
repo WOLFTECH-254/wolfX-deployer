@@ -8,6 +8,83 @@
 import * as zod from "zod";
 
 /**
+ * @summary Get current platform configuration (configured bot + slot info)
+ */
+export const GetPlatformConfigResponse = zod.object({
+  botRepoUrl: zod.string(),
+  botRepoOwner: zod.string(),
+  botRepoName: zod.string(),
+  botName: zod.string(),
+  botDescription: zod.string().nullish(),
+  botLogo: zod.string().nullish(),
+  botAppJson: zod.object({
+    name: zod.string(),
+    description: zod.string().optional(),
+    keywords: zod.array(zod.string()).optional(),
+    env: zod
+      .record(
+        zod.string(),
+        zod.object({
+          description: zod.string().optional(),
+          value: zod.string().optional(),
+          required: zod.boolean().optional(),
+          generator: zod.string().optional(),
+        }),
+      )
+      .optional(),
+    scripts: zod.record(zod.string(), zod.string()).optional(),
+  }),
+  slotCount: zod.number(),
+  totalSlots: zod.number(),
+  occupiedSlots: zod.number(),
+  availableSlots: zod.number(),
+  updatedAt: zod.coerce.date(),
+  adminPasswordIsDefault: zod.boolean(),
+});
+
+/**
+ * @summary Update platform's configured bot and/or slot count (admin only)
+ */
+export const updatePlatformConfigBodySlotCountMax = 500;
+
+export const UpdatePlatformConfigBody = zod.object({
+  botRepoUrl: zod
+    .string()
+    .optional()
+    .describe("New GitHub repo URL for the bot"),
+  slotCount: zod
+    .number()
+    .min(1)
+    .max(updatePlatformConfigBodySlotCountMax)
+    .optional(),
+});
+
+export const UpdatePlatformConfigResponse = zod.object({
+  success: zod.boolean(),
+  message: zod.string().optional(),
+});
+
+/**
+ * @summary Verify admin password
+ */
+export const PlatformLoginBody = zod.object({
+  password: zod.string(),
+});
+
+export const PlatformLoginResponse = zod.object({
+  success: zod.boolean(),
+  message: zod.string().optional(),
+});
+
+/**
+ * @summary Get fingerprints of currently-active SESSION_IDs (last 6 chars only)
+ */
+export const GetActiveSessionsResponse = zod.object({
+  count: zod.number(),
+  fingerprints: zod.array(zod.string()),
+});
+
+/**
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -329,7 +406,12 @@ export const ListDeploymentsResponse = zod.array(ListDeploymentsResponseItem);
  * @summary Deploy a bot to a server slot
  */
 export const CreateDeploymentBody = zod.object({
-  appId: zod.number().describe("ID of the registered app to deploy"),
+  appId: zod
+    .number()
+    .nullish()
+    .describe(
+      "Optional app ID. If omitted, the platform's configured bot is used.",
+    ),
   serverId: zod
     .number()
     .nullish()
