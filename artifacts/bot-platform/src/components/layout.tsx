@@ -76,7 +76,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <div className="min-w-0">
               <span className="text-sm font-display font-extrabold text-foreground tracking-tight truncate block" data-testid="sidebar-brand">
                 {brand.head && <span>{brand.head}</span>}
-                <span className="text-primary text-glow-accent">{brand.tail}</span>
+                <span className="text-foreground/55">{brand.tail}</span>
               </span>
               <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Open source · self-hosted</p>
             </div>

@@ -77,9 +77,9 @@
   --elevate-2: rgba(255,255,255, .07);
 
   /* Theme accent control trio (overridden per data-theme below) */
-  --accent-h: 135;
-  --accent-s: 70%;
-  --accent-l: 48%;
+  --accent-h: 140;
+  --accent-s: 42%;
+  --accent-l: 38%;
 
   /* Backdrop tint for the body radial glows */
   --bg-tint-h: var(--accent-h);
@@ -140,19 +140,19 @@
 
 /* ---------- Theme variants (set on <html data-theme="..."> ) ---------- */
 :root[data-theme="green"] {
-  --accent-h: 135;
-  --accent-s: 70%;
-  --accent-l: 48%;
+  --accent-h: 140;
+  --accent-s: 42%;
+  --accent-l: 38%;
 }
 :root[data-theme="blue"] {
   --accent-h: 215;
-  --accent-s: 85%;
-  --accent-l: 58%;
+  --accent-s: 55%;
+  --accent-l: 48%;
 }
 :root[data-theme="purple"] {
   --accent-h: 270;
-  --accent-s: 70%;
-  --accent-l: 60%;
+  --accent-s: 45%;
+  --accent-l: 52%;
 }
 /* "black" = neutral / white accents on near-black background */
 :root[data-theme="black"] {
@@ -189,8 +189,8 @@
   body {
     @apply font-sans antialiased text-foreground;
     background:
-      radial-gradient(ellipse 70% 45% at 50% -10%, hsla(var(--bg-tint-h), var(--bg-tint-s), 30%, 0.07), transparent 60%),
-      radial-gradient(ellipse 55% 35% at 50% 110%, hsla(var(--bg-tint-h), var(--bg-tint-s), 25%, 0.04), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 50% -10%, hsla(var(--bg-tint-h), var(--bg-tint-s), 25%, 0.035), transparent 60%),
+      radial-gradient(ellipse 50% 30% at 50% 110%, hsla(var(--bg-tint-h), var(--bg-tint-s), 20%, 0.02), transparent 60%),
       hsl(var(--background));
     background-attachment: fixed;
     position: relative;
@@ -203,13 +203,13 @@
     position: fixed;
     inset: 0;
     background-image:
-      linear-gradient(hsla(var(--accent-h), var(--accent-s), 50%, 0.022) 1px, transparent 1px),
-      linear-gradient(90deg, hsla(var(--accent-h), var(--accent-s), 50%, 0.022) 1px, transparent 1px);
+      linear-gradient(hsla(var(--accent-h), var(--accent-s), 50%, 0.014) 1px, transparent 1px),
+      linear-gradient(90deg, hsla(var(--accent-h), var(--accent-s), 50%, 0.014) 1px, transparent 1px);
     background-size: 56px 56px;
     pointer-events: none;
     z-index: 0;
-    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 85%);
-            mask-image: radial-gradient(ellipse at center, black 30%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 25%, transparent 80%);
+            mask-image: radial-gradient(ellipse at center, black 25%, transparent 80%);
   }
 
   body > #root {
@@ -226,8 +226,8 @@
 @layer utilities {
   .text-glow-accent {
     text-shadow:
-      0 0 6px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.30),
-      0 0 18px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.18);
+      0 0 3px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.10),
+      0 0 8px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.04);
   }
 
   /* Backwards-compat alias used in older code */
@@ -235,17 +235,17 @@
 
   .ring-glow-accent {
     box-shadow:
-      0 0 0 1px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.22),
-      0 0 18px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.10),
-      inset 0 0 16px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.025);
+      0 0 0 1px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.14),
+      0 0 12px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.05),
+      inset 0 0 12px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.015);
   }
   .ring-glow-green { @apply ring-glow-accent; }
 
   .btn-glow-accent {
     box-shadow:
-      0 0 0 1px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.35),
-      0 6px 22px -10px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.40),
-      inset 0 1px 0 hsla(var(--accent-h), 60%, 80%, 0.12);
+      0 0 0 1px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.22),
+      0 4px 16px -10px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.22),
+      inset 0 1px 0 hsla(var(--accent-h), 50%, 80%, 0.08);
   }
   .btn-glow-green { @apply btn-glow-accent; }
 
@@ -257,14 +257,14 @@
   @keyframes live-pulse {
     0%, 100% {
       opacity: 1;
-      box-shadow: 0 0 0 0 hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.45);
+      box-shadow: 0 0 0 0 hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.28);
     }
     50% {
-      opacity: 0.85;
-      box-shadow: 0 0 0 5px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0);
+      opacity: 0.9;
+      box-shadow: 0 0 0 4px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0);
     }
   }
   .live-dot {
-    animation: live-pulse 2s ease-in-out infinite;
+    animation: live-pulse 2.4s ease-in-out infinite;
   }
 }

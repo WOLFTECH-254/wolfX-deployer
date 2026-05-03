@@ -180,7 +180,7 @@ export default function Landing() {
               className="font-display font-black text-foreground text-6xl sm:text-7xl lg:text-8xl leading-[0.9] tracking-tighter"
             >
               {split.head && <span>{split.head}</span>}
-              <span className="text-primary text-glow-green">{split.tail}</span>
+              <span className="text-foreground/55">{split.tail}</span>
             </h1>
 
             <p className="text-xs font-mono uppercase tracking-[0.3em] text-muted-foreground">
