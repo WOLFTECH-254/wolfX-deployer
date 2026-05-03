@@ -3,20 +3,28 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: WhatsApp Bot Hosting Platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: apps
+    description: GitHub app registry
+  - name: servers
+    description: Server pool management
+  - name: deployments
+    description: Bot deployments
+  - name: github
+    description: GitHub utilities
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +32,360 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /github/fetch-app-json:
+    post:
+      operationId: fetchAppJson
+      tags: [github]
+      summary: Fetch and parse app.json from a GitHub repo URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FetchAppJsonBody"
+      responses:
+        "200":
+          description: Parsed app.json data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppJsonData"
+        "400":
+          description: Invalid URL or missing app.json
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /apps:
+    get:
+      operationId: listApps
+      tags: [apps]
+      summary: List all registered apps
+      responses:
+        "200":
+          description: List of registered apps
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/App"
+    post:
+      operationId: createApp
+      tags: [apps]
+      summary: Register a new app from a GitHub repo URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAppBody"
+      responses:
+        "201":
+          description: Created app
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/App"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /apps/{id}:
+    get:
+      operationId: getApp
+      tags: [apps]
+      summary: Get app details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: App details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/App"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteApp
+      tags: [apps]
+      summary: Delete a registered app
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /servers:
+    get:
+      operationId: listServers
+      tags: [servers]
+      summary: List all server slots in the pool
+      responses:
+        "200":
+          description: List of server slots
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Server"
+
+  /servers/stats:
+    get:
+      operationId: getServerStats
+      tags: [servers]
+      summary: Get server pool statistics
+      responses:
+        "200":
+          description: Pool stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerStats"
+
+  /servers/{id}:
+    get:
+      operationId: getServer
+      tags: [servers]
+      summary: Get server slot details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Server details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Server"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /deployments:
+    get:
+      operationId: listDeployments
+      tags: [deployments]
+      summary: List all deployments
+      responses:
+        "200":
+          description: List of deployments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Deployment"
+    post:
+      operationId: createDeployment
+      tags: [deployments]
+      summary: Deploy a bot to a server slot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDeploymentBody"
+      responses:
+        "201":
+          description: Deployment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deployment"
+        "400":
+          description: Validation error or no free servers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /deployments/recent:
+    get:
+      operationId: getRecentDeployments
+      tags: [deployments]
+      summary: Get recently deployed bots (last 10)
+      responses:
+        "200":
+          description: Recent deployments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Deployment"
+
+  /deployments/summary:
+    get:
+      operationId: getDeploymentSummary
+      tags: [deployments]
+      summary: Get deployment counts grouped by status
+      responses:
+        "200":
+          description: Summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeploymentSummary"
+
+  /deployments/{id}:
+    get:
+      operationId: getDeployment
+      tags: [deployments]
+      summary: Get deployment details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deployment details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deployment"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteDeployment
+      tags: [deployments]
+      summary: Stop and remove a deployment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /deployments/{id}/restart:
+    post:
+      operationId: restartDeployment
+      tags: [deployments]
+      summary: Restart a deployment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Restarted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deployment"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /deployments/{id}/stop:
+    post:
+      operationId: stopDeployment
+      tags: [deployments]
+      summary: Stop a running deployment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Stopped
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Deployment"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /deployments/{id}/logs:
+    get:
+      operationId: getDeploymentLogs
+      tags: [deployments]
+      summary: Get logs for a deployment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deployment logs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeploymentLogs"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +393,228 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required: [success]
+
+    FetchAppJsonBody:
+      type: object
+      properties:
+        repoUrl:
+          type: string
+          description: GitHub repository URL (https://github.com/owner/repo)
+      required: [repoUrl]
+
+    AppJsonEnvVar:
+      type: object
+      properties:
+        description:
+          type: string
+        value:
+          type: string
+        required:
+          type: boolean
+        generator:
+          type: string
+      required: []
+
+    AppJsonData:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        env:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/AppJsonEnvVar"
+        scripts:
+          type: object
+          additionalProperties:
+            type: string
+      required: [name]
+
+    App:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        repoUrl:
+          type: string
+        repoOwner:
+          type: string
+        repoName:
+          type: string
+        appJson:
+          $ref: "#/components/schemas/AppJsonData"
+        deploymentCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, name, repoUrl, repoOwner, repoName, appJson, deploymentCount, createdAt, updatedAt]
+
+    CreateAppBody:
+      type: object
+      properties:
+        repoUrl:
+          type: string
+          description: GitHub repository URL
+      required: [repoUrl]
+
+    Server:
+      type: object
+      properties:
+        id:
+          type: integer
+        slotNumber:
+          type: integer
+        label:
+          type: string
+        status:
+          type: string
+          enum: [available, occupied, maintenance]
+        region:
+          type: string
+        currentDeploymentId:
+          type: integer
+          nullable: true
+        currentDeployment:
+          $ref: "#/components/schemas/Deployment"
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, slotNumber, label, status, region, createdAt]
+
+    ServerStats:
+      type: object
+      properties:
+        total:
+          type: integer
+        available:
+          type: integer
+        occupied:
+          type: integer
+        maintenance:
+          type: integer
+      required: [total, available, occupied, maintenance]
+
+    Deployment:
+      type: object
+      properties:
+        id:
+          type: integer
+        appId:
+          type: integer
+        serverId:
+          type: integer
+        status:
+          type: string
+          enum: [pending, running, stopped, failed, restarting]
+        envConfig:
+          type: object
+          additionalProperties:
+            type: string
+        deployedBy:
+          type: string
+          nullable: true
+        app:
+          $ref: "#/components/schemas/App"
+          nullable: true
+        server:
+          $ref: "#/components/schemas/Server"
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, appId, serverId, status, envConfig, createdAt, updatedAt]
+
+    CreateDeploymentBody:
+      type: object
+      properties:
+        appId:
+          type: integer
+          description: ID of the registered app to deploy
+        serverId:
+          type: integer
+          nullable: true
+          description: Optional specific server slot ID. If omitted, auto-assigns a free slot.
+        envConfig:
+          type: object
+          additionalProperties:
+            type: string
+          description: Environment variable values from the app.json form
+        deployedBy:
+          type: string
+          nullable: true
+          description: Name or handle of the person deploying
+      required: [appId, envConfig]
+
+    DeploymentSummary:
+      type: object
+      properties:
+        running:
+          type: integer
+        stopped:
+          type: integer
+        pending:
+          type: integer
+        failed:
+          type: integer
+        total:
+          type: integer
+      required: [running, stopped, pending, failed, total]
+
+    DeploymentLogs:
+      type: object
+      properties:
+        deploymentId:
+          type: integer
+        logs:
+          type: array
+          items:
+            $ref: "#/components/schemas/LogEntry"
+      required: [deploymentId, logs]
+
+    LogEntry:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        level:
+          type: string
+          enum: [info, warn, error]
+        message:
+          type: string
+      required: [timestamp, level, message]
