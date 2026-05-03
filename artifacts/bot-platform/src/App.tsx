@@ -11,6 +11,9 @@ import Servers from "@/pages/servers";
 import Deployments from "@/pages/deployments";
 import DeploymentsNew from "@/pages/deployments-new";
 import DeploymentDetail from "@/pages/deployment-detail";
+import Apps from "@/pages/apps";
+import AppsNew from "@/pages/apps-new";
+import AppDetail from "@/pages/app-detail";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,6 +35,10 @@ function Router() {
         <Route path="/deployments" component={Deployments} />
         <Route path="/deployments/new" component={DeploymentsNew} />
         <Route path="/deployments/:id" component={DeploymentDetail} />
+        {/* Legacy multi-app registry routes; unlinked from sidebar but kept reachable */}
+        <Route path="/apps" component={Apps} />
+        <Route path="/apps/new" component={AppsNew} />
+        <Route path="/apps/:id" component={AppDetail} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
