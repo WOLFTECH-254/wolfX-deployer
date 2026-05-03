@@ -203,6 +203,20 @@ export default function DeploymentsNew() {
             <h2 className="text-sm font-semibold text-foreground">Choose a free slot</h2>
             <p className="text-xs text-muted-foreground mt-0.5">Leave unselected to auto-assign the next available slot.</p>
           </div>
+          <div className="grid grid-cols-3 gap-2" data-testid="slot-summary">
+            <div className="px-3 py-2 rounded-md border border-emerald-500/20 bg-emerald-400/5">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Free</p>
+              <p className="text-lg font-bold text-emerald-400 tabular-nums" data-testid="summary-free">{freeServers.length}</p>
+            </div>
+            <div className="px-3 py-2 rounded-md border border-primary/20 bg-primary/5">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Taken</p>
+              <p className="text-lg font-bold text-primary tabular-nums" data-testid="summary-taken">{slotCount - freeServers.length}</p>
+            </div>
+            <div className="px-3 py-2 rounded-md border border-border bg-card">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Total</p>
+              <p className="text-lg font-bold text-foreground tabular-nums" data-testid="summary-total">{slotCount}</p>
+            </div>
+          </div>
           {freeServers.length === 0 && (
             <div className="text-center py-8 border border-dashed border-red-500/20 rounded-lg">
               <Server className="h-8 w-8 text-red-400 mx-auto mb-2" />

@@ -2,6 +2,7 @@ import { Link, useLocation } from "wouter";
 import { LayoutDashboard, Bot, Server, Rocket, PlusCircle, Menu, X, Terminal, Settings } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { LiveCounter } from "./live-counter";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -84,11 +85,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-border bg-card sticky top-0 z-10">
-          <button onClick={() => setMobileOpen(true)} className="text-muted-foreground hover:text-foreground" data-testid="mobile-menu-btn">
+        <header className="flex items-center gap-3 px-4 py-2.5 border-b border-border bg-card sticky top-0 z-10">
+          <button onClick={() => setMobileOpen(true)} className="text-muted-foreground hover:text-foreground md:hidden" data-testid="mobile-menu-btn">
             <Menu className="h-5 w-5" />
           </button>
-          <span className="text-sm font-bold text-foreground">WaBotDeploy</span>
+          <span className="text-sm font-bold text-foreground md:hidden">WaBotDeploy</span>
+          <div className="ml-auto">
+            <LiveCounter />
+          </div>
         </header>
 
         <main className="flex-1 p-4 md:p-6 overflow-auto">{children}</main>
