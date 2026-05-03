@@ -17,14 +17,33 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const cfg = useGetPlatformConfig();
   const themeRaw = cfg.data?.botAppJson?.theme;
   const theme: ThemeName = isValidTheme(themeRaw) ? themeRaw : "green";
+  const botName = cfg.data?.botName;
+  const botLogo = cfg.data?.botLogo ?? cfg.data?.botAppJson?.logo ?? null;
 
   useEffect(() => {
-    const root = document.documentElement;
-    root.setAttribute("data-theme", theme);
-    return () => {
-      // Don't strip on unmount — the provider lives at the app root.
-    };
+    document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
+
+  // Sync browser tab title with the configured bot name.
+  useEffect(() => {
+    if (botName && botName.trim().length > 0) {
+      document.title = botName;
+    }
+  }, [botName]);
+
+  // Swap the favicon to the bot's logo when one is provided in app.json.
+  // Falls back to the default themed favicon.svg shipped in /public.
+  useEffect(() => {
+    const link = document.getElementById("app-favicon") as HTMLLinkElement | null;
+    if (!link) return;
+    if (botLogo && /^https?:\/\//i.test(botLogo)) {
+      link.setAttribute("type", "image/png");
+      link.href = botLogo;
+    } else {
+      link.setAttribute("type", "image/svg+xml");
+      link.href = "/favicon.svg";
+    }
+  }, [botLogo]);
 
   return <>{children}</>;
 }
