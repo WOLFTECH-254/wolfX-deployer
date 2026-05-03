@@ -57,6 +57,13 @@ export interface AppJsonData {
   theme?: AppJsonDataTheme;
   /** Optional logo URL displayed in the platform UI. */
   logo?: string;
+  /** Optional admin login password sourced from the bot repo's app.json.
+SECURITY WARNING: app.json lives in a public GitHub repo, so anyone
+who can read the repo can read this value. Prefer setting the
+ADMIN_PASSWORD environment variable instead. ADMIN_PASSWORD always
+takes precedence over this field when both are set.
+ */
+  adminKey?: string;
 }
 
 export interface App {
@@ -161,6 +168,8 @@ export interface PlatformConfig {
   availableSlots: number;
   updatedAt: string;
   adminPasswordIsDefault: boolean;
+  /** True when the active admin password is sourced from app.json (publicly visible). Surfaces a security warning in the admin UI. */
+  adminKeyFromAppJson: boolean;
 }
 
 export interface UpdatePlatformConfigBody {

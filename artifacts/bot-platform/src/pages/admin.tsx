@@ -166,7 +166,22 @@ export default function AdminPage() {
           <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
           <div>
             <p className="font-medium text-amber-200">You're using the default admin password</p>
-            <p className="text-xs mt-0.5">Set <code className="text-xs">ADMIN_PASSWORD</code> in your environment to secure this page in production.</p>
+            <p className="text-xs mt-0.5">
+              Set <code className="text-xs">ADMIN_PASSWORD</code> in your environment, or add an
+              <code className="text-xs"> adminKey</code> field to your bot's <code className="text-xs">app.json</code> to secure this page.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {cfg.data?.adminKeyFromAppJson && (
+        <div className="flex items-start gap-2.5 px-4 py-3 rounded-lg bg-red-500/5 border border-red-500/30 text-sm text-red-300" data-testid="warn-admin-key-public">
+          <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="font-medium text-red-200">Admin password is publicly visible</p>
+            <p className="text-xs mt-0.5">
+              Your admin password is being read from the bot's <code className="text-xs">app.json</code>, which lives in a public GitHub repo. Anyone who can read the repo can log in here. Set <code className="text-xs">ADMIN_PASSWORD</code> as an environment secret instead — it overrides the value in <code className="text-xs">app.json</code>.
+            </p>
           </div>
         </div>
       )}

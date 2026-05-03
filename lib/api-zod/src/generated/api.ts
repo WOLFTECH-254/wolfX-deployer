@@ -43,6 +43,12 @@ export const GetPlatformConfigResponse = zod.object({
       .string()
       .optional()
       .describe("Optional logo URL displayed in the platform UI."),
+    adminKey: zod
+      .string()
+      .optional()
+      .describe(
+        "Optional admin login password sourced from the bot repo's app.json.\nSECURITY WARNING: app.json lives in a public GitHub repo, so anyone\nwho can read the repo can read this value. Prefer setting the\nADMIN_PASSWORD environment variable instead. ADMIN_PASSWORD always\ntakes precedence over this field when both are set.\n",
+      ),
   }),
   platformSourceUrl: zod
     .string()
@@ -56,6 +62,11 @@ export const GetPlatformConfigResponse = zod.object({
   availableSlots: zod.number(),
   updatedAt: zod.coerce.date(),
   adminPasswordIsDefault: zod.boolean(),
+  adminKeyFromAppJson: zod
+    .boolean()
+    .describe(
+      "True when the active admin password is sourced from app.json (publicly visible). Surfaces a security warning in the admin UI.",
+    ),
 });
 
 /**
@@ -142,6 +153,12 @@ export const FetchAppJsonResponse = zod.object({
     .string()
     .optional()
     .describe("Optional logo URL displayed in the platform UI."),
+  adminKey: zod
+    .string()
+    .optional()
+    .describe(
+      "Optional admin login password sourced from the bot repo's app.json.\nSECURITY WARNING: app.json lives in a public GitHub repo, so anyone\nwho can read the repo can read this value. Prefer setting the\nADMIN_PASSWORD environment variable instead. ADMIN_PASSWORD always\ntakes precedence over this field when both are set.\n",
+    ),
 });
 
 /**
@@ -180,6 +197,12 @@ export const ListAppsResponseItem = zod.object({
       .string()
       .optional()
       .describe("Optional logo URL displayed in the platform UI."),
+    adminKey: zod
+      .string()
+      .optional()
+      .describe(
+        "Optional admin login password sourced from the bot repo's app.json.\nSECURITY WARNING: app.json lives in a public GitHub repo, so anyone\nwho can read the repo can read this value. Prefer setting the\nADMIN_PASSWORD environment variable instead. ADMIN_PASSWORD always\ntakes precedence over this field when both are set.\n",
+      ),
   }),
   deploymentCount: zod.number(),
   createdAt: zod.coerce.date(),
@@ -234,6 +257,12 @@ export const GetAppResponse = zod.object({
       .string()
       .optional()
       .describe("Optional logo URL displayed in the platform UI."),
+    adminKey: zod
+      .string()
+      .optional()
+      .describe(
+        "Optional admin login password sourced from the bot repo's app.json.\nSECURITY WARNING: app.json lives in a public GitHub repo, so anyone\nwho can read the repo can read this value. Prefer setting the\nADMIN_PASSWORD environment variable instead. ADMIN_PASSWORD always\ntakes precedence over this field when both are set.\n",
+      ),
   }),
   deploymentCount: zod.number(),
   createdAt: zod.coerce.date(),
@@ -310,6 +339,12 @@ export const ListServersResponseItem = zod.object({
               .string()
               .optional()
               .describe("Optional logo URL displayed in the platform UI."),
+            adminKey: zod
+              .string()
+              .optional()
+              .describe(
+                "Optional admin login password sourced from the bot repo's app.json.\nSECURITY WARNING: app.json lives in a public GitHub repo, so anyone\nwho can read the repo can read this value. Prefer setting the\nADMIN_PASSWORD environment variable instead. ADMIN_PASSWORD always\ntakes precedence over this field when both are set.\n",
+              ),
           }),
           deploymentCount: zod.number(),
           createdAt: zod.coerce.date(),
@@ -397,6 +432,12 @@ export const GetServerResponse = zod.object({
               .string()
               .optional()
               .describe("Optional logo URL displayed in the platform UI."),
+            adminKey: zod
+              .string()
+              .optional()
+              .describe(
+                "Optional admin login password sourced from the bot repo's app.json.\nSECURITY WARNING: app.json lives in a public GitHub repo, so anyone\nwho can read the repo can read this value. Prefer setting the\nADMIN_PASSWORD environment variable instead. ADMIN_PASSWORD always\ntakes precedence over this field when both are set.\n",
+              ),
           }),
           deploymentCount: zod.number(),
           createdAt: zod.coerce.date(),
@@ -455,6 +496,12 @@ export const ListDeploymentsResponseItem = zod.object({
           .string()
           .optional()
           .describe("Optional logo URL displayed in the platform UI."),
+        adminKey: zod
+          .string()
+          .optional()
+          .describe(
+            "Optional admin login password sourced from the bot repo's app.json.\nSECURITY WARNING: app.json lives in a public GitHub repo, so anyone\nwho can read the repo can read this value. Prefer setting the\nADMIN_PASSWORD environment variable instead. ADMIN_PASSWORD always\ntakes precedence over this field when both are set.\n",
+          ),
       }),
       deploymentCount: zod.number(),
       createdAt: zod.coerce.date(),
@@ -547,6 +594,12 @@ export const GetRecentDeploymentsResponseItem = zod.object({
           .string()
           .optional()
           .describe("Optional logo URL displayed in the platform UI."),
+        adminKey: zod
+          .string()
+          .optional()
+          .describe(
+            "Optional admin login password sourced from the bot repo's app.json.\nSECURITY WARNING: app.json lives in a public GitHub repo, so anyone\nwho can read the repo can read this value. Prefer setting the\nADMIN_PASSWORD environment variable instead. ADMIN_PASSWORD always\ntakes precedence over this field when both are set.\n",
+          ),
       }),
       deploymentCount: zod.number(),
       createdAt: zod.coerce.date(),
@@ -631,6 +684,12 @@ export const GetDeploymentResponse = zod.object({
           .string()
           .optional()
           .describe("Optional logo URL displayed in the platform UI."),
+        adminKey: zod
+          .string()
+          .optional()
+          .describe(
+            "Optional admin login password sourced from the bot repo's app.json.\nSECURITY WARNING: app.json lives in a public GitHub repo, so anyone\nwho can read the repo can read this value. Prefer setting the\nADMIN_PASSWORD environment variable instead. ADMIN_PASSWORD always\ntakes precedence over this field when both are set.\n",
+          ),
       }),
       deploymentCount: zod.number(),
       createdAt: zod.coerce.date(),
@@ -713,6 +772,12 @@ export const RestartDeploymentResponse = zod.object({
           .string()
           .optional()
           .describe("Optional logo URL displayed in the platform UI."),
+        adminKey: zod
+          .string()
+          .optional()
+          .describe(
+            "Optional admin login password sourced from the bot repo's app.json.\nSECURITY WARNING: app.json lives in a public GitHub repo, so anyone\nwho can read the repo can read this value. Prefer setting the\nADMIN_PASSWORD environment variable instead. ADMIN_PASSWORD always\ntakes precedence over this field when both are set.\n",
+          ),
       }),
       deploymentCount: zod.number(),
       createdAt: zod.coerce.date(),
@@ -783,6 +848,12 @@ export const StopDeploymentResponse = zod.object({
           .string()
           .optional()
           .describe("Optional logo URL displayed in the platform UI."),
+        adminKey: zod
+          .string()
+          .optional()
+          .describe(
+            "Optional admin login password sourced from the bot repo's app.json.\nSECURITY WARNING: app.json lives in a public GitHub repo, so anyone\nwho can read the repo can read this value. Prefer setting the\nADMIN_PASSWORD environment variable instead. ADMIN_PASSWORD always\ntakes precedence over this field when both are set.\n",
+          ),
       }),
       deploymentCount: zod.number(),
       createdAt: zod.coerce.date(),

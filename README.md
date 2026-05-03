@@ -72,6 +72,7 @@ Your bot repo just needs an `app.json` at the root. The platform fetches it on c
 | `logo`        | Sidebar avatar, terminal mock chip                                        |
 | `theme`       | Accent color across the whole site (`green` \| `blue` \| `purple` \| `black`) |
 | `env`         | The form a user fills in when deploying — labels, descriptions, required validation |
+| `adminKey`    | _Optional._ Password for `/admin`. **⚠️ public.** Use `ADMIN_PASSWORD` secret instead unless your repo is private. |
 
 > The brand string is split visually: the **first half stays white**, the **second half is dimmed**. The accent color is reserved for small functional bits (buttons, status pills, the LIVE dot) — never the giant hero text.
 
@@ -160,8 +161,10 @@ pnpm --filter @workspace/db run push
 | Secret             | Purpose                                                |
 | ------------------ | ------------------------------------------------------ |
 | `DATABASE_URL`     | Postgres connection string (Replit auto-provisions)    |
-| `ADMIN_PASSWORD`   | Password for `/admin` login                            |
+| `ADMIN_PASSWORD`   | Password for `/admin` login. _Or_ provide `adminKey` in your bot's `app.json` (publicly visible — only safe in private repos). |
 | `SESSION_SECRET`   | Random string for signing cookies                      |
+
+> **Admin password resolution order:** `ADMIN_PASSWORD` env var → `adminKey` in `app.json` → in dev only, falls back to `admin`. The admin UI shows a red warning whenever the active password is sourced from `app.json`.
 
 ### Optional secrets
 

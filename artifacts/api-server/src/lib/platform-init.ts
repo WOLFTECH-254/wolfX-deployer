@@ -119,6 +119,7 @@ export async function applyBotConfig(repoUrl: string, slotCount: number) {
   }
 
   await syncSlotCount(slotCount);
+  refreshAdminKeyFromAppJson(appJson);
   return { appId, repo, meta, slotCount };
 }
 
@@ -131,6 +132,8 @@ export async function initPlatformConfig() {
     );
     // Still sync slots in case env override changed
     await syncSlotCount(existing.slotCount);
+    // Re-prime the cached admin key from the stored app.json
+    refreshAdminKeyFromAppJson(existing.botAppJson as Record<string, unknown> | null);
     return;
   }
   const repoUrl = process.env.BOT_REPO_URL ?? DEFAULT_REPO;
@@ -150,17 +153,39 @@ export async function initPlatformConfig() {
   }
 }
 
+// Cached admin key sourced from the bot's app.json (refreshed every time
+// applyBotConfig runs and on platform init). The env var ADMIN_PASSWORD always
+// takes precedence over this when both are set.
+let cachedAdminKeyFromAppJson: string | null = null;
+
+function extractAdminKey(appJson: Record<string, unknown> | null | undefined): string | null {
+  if (!appJson) return null;
+  const v = appJson.adminKey;
+  return typeof v === "string" && v.trim().length > 0 ? v.trim() : null;
+}
+
+export function refreshAdminKeyFromAppJson(appJson: Record<string, unknown> | null | undefined) {
+  cachedAdminKeyFromAppJson = extractAdminKey(appJson);
+}
+
 export function getAdminPassword(): string {
   const env = process.env.ADMIN_PASSWORD?.trim();
   if (env) return env;
+  if (cachedAdminKeyFromAppJson) return cachedAdminKeyFromAppJson;
   if (process.env.NODE_ENV === "production") {
     throw new Error(
-      "ADMIN_PASSWORD must be set in production. Refusing to use the default 'admin' password.",
+      "ADMIN_PASSWORD must be set in production (or adminKey in the bot's app.json). Refusing to use the default 'admin' password.",
     );
   }
   return "admin";
 }
 
 export function isAdminPasswordDefault(): boolean {
-  return !process.env.ADMIN_PASSWORD?.trim();
+  return !process.env.ADMIN_PASSWORD?.trim() && !cachedAdminKeyFromAppJson;
+}
+
+export function isAdminKeyFromAppJson(): boolean {
+  // True only when env is unset AND app.json provided one — i.e. the active
+  // password is publicly visible in the bot repo.
+  return !process.env.ADMIN_PASSWORD?.trim() && !!cachedAdminKeyFromAppJson;
 }

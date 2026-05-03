@@ -2,7 +2,7 @@ import { Router } from "express";
 import { eq } from "drizzle-orm";
 import { db, platformConfigTable, serversTable, deploymentsTable } from "@workspace/db";
 import { sql } from "drizzle-orm";
-import { applyBotConfig, getAdminPassword, isAdminPasswordDefault } from "../lib/platform-init";
+import { applyBotConfig, getAdminPassword, isAdminPasswordDefault, isAdminKeyFromAppJson } from "../lib/platform-init";
 import { AppJsonFetchError } from "../lib/github";
 import { requireAdmin } from "../middlewares/admin";
 import { clearRepoCache, getCapacityInfo } from "../lib/runner";
@@ -38,6 +38,7 @@ router.get("/platform/config", async (_req, res) => {
     availableSlots: Math.max(0, cfg.slotCount - occupied),
     updatedAt: cfg.updatedAt,
     adminPasswordIsDefault: isAdminPasswordDefault(),
+    adminKeyFromAppJson: isAdminKeyFromAppJson(),
     capacity: getCapacityInfo(),
   });
 });

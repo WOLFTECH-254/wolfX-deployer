@@ -550,6 +550,14 @@ components:
         logo:
           type: string
           description: Optional logo URL displayed in the platform UI.
+        adminKey:
+          type: string
+          description: |
+            Optional admin login password sourced from the bot repo's app.json.
+            SECURITY WARNING: app.json lives in a public GitHub repo, so anyone
+            who can read the repo can read this value. Prefer setting the
+            ADMIN_PASSWORD environment variable instead. ADMIN_PASSWORD always
+            takes precedence over this field when both are set.
       required: [name]
 
     App:
@@ -716,8 +724,11 @@ components:
           format: date-time
         adminPasswordIsDefault:
           type: boolean
+        adminKeyFromAppJson:
+          type: boolean
+          description: True when the active admin password is sourced from app.json (publicly visible). Surfaces a security warning in the admin UI.
       required:
-        [botRepoUrl, botRepoOwner, botRepoName, botName, botAppJson, slotCount, totalSlots, occupiedSlots, availableSlots, updatedAt, adminPasswordIsDefault]
+        [botRepoUrl, botRepoOwner, botRepoName, botName, botAppJson, slotCount, totalSlots, occupiedSlots, availableSlots, updatedAt, adminPasswordIsDefault, adminKeyFromAppJson]
 
     UpdatePlatformConfigBody:
       type: object
