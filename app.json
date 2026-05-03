@@ -1,0 +1,54 @@
+{
+  "name": "WaBotDeploy",
+  "description": "Self-hostable single-bot WhatsApp hosting platform. Forks a configurable bot repo, gives users a session-based deploy form, and runs each session in an isolated slot.",
+  "keywords": ["whatsapp", "bot", "hosting", "deploy", "platform", "replit", "heroku"],
+  "repository": "https://github.com/your-fork/wabotdeploy",
+  "stack": "heroku-22",
+  "buildpacks": [
+    { "url": "heroku/nodejs" }
+  ],
+  "addons": [
+    { "plan": "heroku-postgresql:essential-0" }
+  ],
+  "env": {
+    "ADMIN_PASSWORD": {
+      "description": "Password for the /admin login page. Required.",
+      "generator": "secret"
+    },
+    "SESSION_SECRET": {
+      "description": "Random string used to sign cookies. Required.",
+      "generator": "secret"
+    },
+    "BOT_REPO_URL": {
+      "description": "GitHub URL of the bot you want to host. Read on first boot; can be changed later from /admin.",
+      "value": "https://github.com/WOLFTECH-254/silentwolf",
+      "required": false
+    },
+    "SLOT_COUNT": {
+      "description": "How many concurrent user sessions the platform allows.",
+      "value": "30",
+      "required": false
+    },
+    "MAX_CONCURRENT_BOTS": {
+      "description": "Hard cap on simultaneously running bot child processes. Tune to dyno memory.",
+      "value": "6",
+      "required": false
+    },
+    "PLATFORM_SOURCE_URL": {
+      "description": "Optional URL the landing page Source button points to (your fork on GitHub).",
+      "required": false
+    },
+    "NODE_ENV": {
+      "value": "production"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "scripts": {
+    "postdeploy": "pnpm --filter @workspace/db run push"
+  }
+}

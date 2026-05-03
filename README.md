@@ -1,6 +1,12 @@
 # WaBotDeploy
 
-> Single-bot WhatsApp hosting platform. Fork it, point it at your bot's GitHub repo, deploy on Replit, and your community gets a hosted page where they can spin up their own session in seconds.
+> Single-bot WhatsApp hosting platform. Fork it, point it at your bot's GitHub repo, deploy on Replit (or Heroku), and your community gets a hosted page where they can spin up their own session in seconds.
+
+[![Deploy on Replit](https://replit.com/badge/github/your-fork/wabotdeploy)](https://replit.com/new/github.com/your-fork/wabotdeploy)
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+> 💡 After forking, replace `your-fork/wabotdeploy` in the badge URLs above with your own GitHub `owner/repo` so the buttons point at your fork. The Heroku button reads `app.json` at the repo root.
+
 
 WaBotDeploy is an open-source, self-hostable platform for **one** WhatsApp bot at a time. You (the developer) deploy it once. Your users (the community) visit your site, drop in their session credentials, and a fresh instance of *your* bot runs on a slot you control. No DevOps required from them.
 
