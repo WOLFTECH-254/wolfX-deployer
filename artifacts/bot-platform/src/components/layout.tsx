@@ -6,7 +6,7 @@ import { LiveCounter } from "./live-counter";
 import { useIsAdmin } from "@/lib/admin-auth";
 
 const baseNavItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/bot", label: "Bot", icon: Bot },
   { href: "/servers", label: "Slots", icon: Server },
   { href: "/deployments", label: "Deployments", icon: Rocket },
@@ -15,7 +15,7 @@ const adminNavItem = { href: "/admin", label: "Admin", icon: Settings };
 
 function NavLink({ href, label, icon: Icon, onClick }: { href: string; label: string; icon: React.ComponentType<{ className?: string }>; onClick?: () => void }) {
   const [location] = useLocation();
-  const isActive = href === "/" ? location === "/" : location.startsWith(href);
+  const isActive = href === "/dashboard" ? location === "/dashboard" : location.startsWith(href);
   return (
     <Link
       href={href}
@@ -53,13 +53,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="flex items-center gap-2 px-4 py-4 border-b border-border">
-          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/20 border border-primary/30">
-            <Terminal className="h-4 w-4 text-primary" />
-          </div>
-          <div>
-            <span className="text-sm font-bold text-foreground tracking-tight">WaBotDeploy</span>
-            <p className="text-[10px] text-muted-foreground">Open Source Platform</p>
-          </div>
+          <Link href="/" data-testid="sidebar-home" className="flex items-center gap-2 flex-1 min-w-0 hover:opacity-80 transition-opacity">
+            <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/15 border border-primary/30">
+              <Terminal className="h-4 w-4 text-primary" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-sm font-display font-extrabold text-foreground tracking-tight">
+                <span>WaBot</span><span className="text-primary text-glow-green">Deploy</span>
+              </span>
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Open source</p>
+            </div>
+          </Link>
           <button onClick={() => setMobileOpen(false)} className="ml-auto md:hidden text-muted-foreground hover:text-foreground">
             <X className="h-4 w-4" />
           </button>

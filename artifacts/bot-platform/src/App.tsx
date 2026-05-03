@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout";
 import NotFound from "@/pages/not-found";
+import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import BotPage from "@/pages/bot";
 import AdminPage from "@/pages/admin";
@@ -26,22 +27,29 @@ const queryClient = new QueryClient({
 
 function Router() {
   return (
-    <Layout>
-      <Switch>
-        <Route path="/" component={Dashboard} />
-        <Route path="/bot" component={BotPage} />
-        <Route path="/admin" component={AdminPage} />
-        <Route path="/servers" component={Servers} />
-        <Route path="/deployments" component={Deployments} />
-        <Route path="/deployments/new" component={DeploymentsNew} />
-        <Route path="/deployments/:id" component={DeploymentDetail} />
-        {/* Legacy multi-app registry routes; unlinked from sidebar but kept reachable */}
-        <Route path="/apps" component={Apps} />
-        <Route path="/apps/new" component={AppsNew} />
-        <Route path="/apps/:id" component={AppDetail} />
-        <Route component={NotFound} />
-      </Switch>
-    </Layout>
+    <Switch>
+      {/* Public landing page lives outside the sidebar layout */}
+      <Route path="/" component={Landing} />
+      {/* Everything else uses the app layout */}
+      <Route>
+        <Layout>
+          <Switch>
+            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/bot" component={BotPage} />
+            <Route path="/admin" component={AdminPage} />
+            <Route path="/servers" component={Servers} />
+            <Route path="/deployments" component={Deployments} />
+            <Route path="/deployments/new" component={DeploymentsNew} />
+            <Route path="/deployments/:id" component={DeploymentDetail} />
+            {/* Legacy multi-app registry routes; unlinked from sidebar but kept reachable */}
+            <Route path="/apps" component={Apps} />
+            <Route path="/apps/new" component={AppsNew} />
+            <Route path="/apps/:id" component={AppDetail} />
+            <Route component={NotFound} />
+          </Switch>
+        </Layout>
+      </Route>
+    </Switch>
   );
 }
 

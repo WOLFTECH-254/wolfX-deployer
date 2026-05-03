@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
@@ -59,6 +60,7 @@
   --font-sans: var(--app-font-sans);
   --font-serif: var(--app-font-serif);
   --font-mono: var(--app-font-mono);
+  --font-display: var(--app-font-display);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -67,62 +69,63 @@
 }
 
 :root {
-  --button-outline: rgba(255,255,255, .10);
-  --badge-outline: rgba(255,255,255, .05);
+  --button-outline: rgba(74, 222, 128, .15);
+  --badge-outline: rgba(74, 222, 128, .12);
   --opaque-button-border-intensity: 9;
-  --elevate-1: rgba(255,255,255, .04);
-  --elevate-2: rgba(255,255,255, .09);
+  --elevate-1: rgba(74, 222, 128, .04);
+  --elevate-2: rgba(74, 222, 128, .09);
 
-  /* Force dark mode */
-  --background: 220 20% 6%;
-  --foreground: 220 10% 90%;
-  --border: 220 15% 15%;
+  /* Neon-green-on-black theme (matrix / hacker terminal vibe) */
+  --background: 140 30% 3%;
+  --foreground: 140 15% 92%;
+  --border: 140 25% 12%;
 
-  --card: 220 20% 8%;
-  --card-foreground: 220 10% 90%;
-  --card-border: 220 15% 15%;
+  --card: 140 30% 5%;
+  --card-foreground: 140 15% 92%;
+  --card-border: 140 25% 12%;
 
-  --sidebar: 220 20% 6%;
-  --sidebar-foreground: 220 10% 90%;
-  --sidebar-border: 220 15% 15%;
-  --sidebar-primary: 175 70% 45%;
-  --sidebar-primary-foreground: 220 20% 6%;
-  --sidebar-accent: 220 15% 15%;
-  --sidebar-accent-foreground: 220 10% 90%;
-  --sidebar-ring: 175 70% 45%;
+  --sidebar: 140 35% 4%;
+  --sidebar-foreground: 140 15% 92%;
+  --sidebar-border: 140 25% 12%;
+  --sidebar-primary: 135 100% 55%;
+  --sidebar-primary-foreground: 140 30% 3%;
+  --sidebar-accent: 140 25% 12%;
+  --sidebar-accent-foreground: 140 15% 92%;
+  --sidebar-ring: 135 100% 55%;
 
-  --popover: 220 20% 8%;
-  --popover-foreground: 220 10% 90%;
-  --popover-border: 220 15% 15%;
+  --popover: 140 30% 5%;
+  --popover-foreground: 140 15% 92%;
+  --popover-border: 140 25% 12%;
 
-  --primary: 175 70% 45%; /* Cyan/Teal */
-  --primary-foreground: 220 20% 6%;
+  --primary: 135 100% 55%; /* Neon green */
+  --primary-foreground: 140 30% 3%;
 
-  --secondary: 220 15% 15%;
-  --secondary-foreground: 220 10% 90%;
+  --secondary: 140 25% 12%;
+  --secondary-foreground: 140 15% 92%;
 
-  --muted: 220 15% 12%;
-  --muted-foreground: 220 10% 60%;
+  --muted: 140 25% 9%;
+  --muted-foreground: 140 10% 60%;
 
-  --accent: 175 70% 45%;
-  --accent-foreground: 220 20% 6%;
+  --accent: 135 100% 55%;
+  --accent-foreground: 140 30% 3%;
 
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 220 10% 90%;
+  --destructive: 0 75% 55%;
+  --destructive-foreground: 140 15% 95%;
 
-  --input: 220 15% 15%;
-  --ring: 175 70% 45%;
+  --input: 140 25% 12%;
+  --ring: 135 100% 55%;
 
-  --chart-1: 175 70% 45%;
-  --chart-2: 145 60% 45%;
-  --chart-3: 205 60% 45%;
-  --chart-4: 25 70% 50%;
-  --chart-5: 285 60% 55%;
+  --chart-1: 135 100% 55%;
+  --chart-2: 100 70% 50%;
+  --chart-3: 165 70% 50%;
+  --chart-4: 50 95% 55%;
+  --chart-5: 285 70% 60%;
 
-  --app-font-sans: 'Space Mono', monospace;
+  --app-font-sans: 'Inter', system-ui, sans-serif;
   --app-font-serif: Georgia, serif;
-  --app-font-mono: 'Space Mono', monospace;
-  --radius: .25rem;
+  --app-font-mono: 'Space Mono', ui-monospace, monospace;
+  --app-font-display: 'Inter', system-ui, sans-serif;
+  --radius: .375rem;
 }
 
 @layer base {
@@ -130,7 +133,81 @@
     @apply border-border;
   }
 
+  html, body, #root {
+    background-color: hsl(var(--background));
+  }
+
   body {
-    @apply font-mono antialiased bg-background text-foreground;
+    @apply font-sans antialiased text-foreground;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, hsla(135, 100%, 35%, 0.15), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 50% 110%, hsla(135, 100%, 30%, 0.08), transparent 60%),
+      hsl(var(--background));
+    background-attachment: fixed;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  /* Subtle grid overlay over the entire site */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(hsla(135, 100%, 50%, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, hsla(135, 100%, 50%, 0.04) 1px, transparent 1px);
+    background-size: 56px 56px;
+    pointer-events: none;
+    z-index: 0;
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 85%);
+            mask-image: radial-gradient(ellipse at center, black 30%, transparent 85%);
+  }
+
+  /* Make sure all real content sits above the grid */
+  body > #root {
+    position: relative;
+    z-index: 1;
+  }
+
+  ::selection {
+    background-color: hsla(135, 100%, 55%, 0.35);
+    color: hsl(140, 15%, 95%);
+  }
+}
+
+@layer utilities {
+  .text-glow-green {
+    text-shadow:
+      0 0 8px hsla(135, 100%, 55%, 0.6),
+      0 0 24px hsla(135, 100%, 50%, 0.4),
+      0 0 48px hsla(135, 100%, 45%, 0.25);
+  }
+
+  .ring-glow-green {
+    box-shadow:
+      0 0 0 1px hsla(135, 100%, 55%, 0.4),
+      0 0 24px hsla(135, 100%, 50%, 0.25),
+      inset 0 0 24px hsla(135, 100%, 50%, 0.05);
+  }
+
+  .btn-glow-green {
+    box-shadow:
+      0 0 0 1px hsla(135, 100%, 55%, 0.5),
+      0 8px 32px -8px hsla(135, 100%, 50%, 0.6),
+      inset 0 1px 0 hsla(135, 100%, 70%, 0.2);
+  }
+
+  .font-display {
+    font-family: var(--app-font-display);
+    letter-spacing: -0.04em;
+  }
+
+  /* Live pulse dot used in pills */
+  @keyframes live-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 hsla(135, 100%, 55%, 0.6); }
+    50%      { opacity: 0.8; box-shadow: 0 0 0 6px hsla(135, 100%, 55%, 0); }
+  }
+  .live-dot {
+    animation: live-pulse 1.8s ease-in-out infinite;
   }
 }
